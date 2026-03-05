@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.NoSuchElementException;
+
 @Controller
 @RequestMapping("/admin/members")
 public class AdminMemberController {
@@ -45,9 +47,13 @@ public class AdminMemberController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        final Member member = memberService.findById(id);
-        model.addAttribute("member", member);
-        return "member/edit";
+        try {
+            final Member member = memberService.findById(id);
+            model.addAttribute("member", member);
+            return "member/edit";
+        } catch (NoSuchElementException e) {
+            return "redirect:/admin/members";
+        }
     }
 
     @PostMapping("/{id}/edit")
@@ -56,8 +62,12 @@ public class AdminMemberController {
         @RequestParam String email,
         @RequestParam String password
     ) {
-        memberService.update(id, email, password);
-        return "redirect:/admin/members";
+        try {
+            memberService.update(id, email, password);
+            return "redirect:/admin/members";
+        } catch (NoSuchElementException e) {
+            return "redirect:/admin/members";
+        }
     }
 
     @PostMapping("/{id}/charge-point")
@@ -65,8 +75,12 @@ public class AdminMemberController {
         @PathVariable Long id,
         @RequestParam int amount
     ) {
-        memberService.chargePoint(id, amount);
-        return "redirect:/admin/members";
+        try {
+            memberService.chargePoint(id, amount);
+            return "redirect:/admin/members";
+        } catch (NoSuchElementException e) {
+            return "redirect:/admin/members";
+        }
     }
 
     @PostMapping("/{id}/delete")
