@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.NoSuchElementException;
 
@@ -73,13 +74,17 @@ public class AdminMemberController {
     @PostMapping("/{id}/charge-point")
     public String chargePoint(
         @PathVariable Long id,
-        @RequestParam int amount
+        @RequestParam int amount,
+        RedirectAttributes redirectAttributes
     ) {
         try {
             memberService.chargePoint(id, amount);
             return "redirect:/admin/members";
         } catch (NoSuchElementException e) {
             return "redirect:/admin/members";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/members/" + id + "/edit";
         }
     }
 
