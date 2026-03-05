@@ -52,13 +52,15 @@ public class OrderService {
         option.subtractQuantity(request.quantity());
         optionRepository.save(option);
 
+        // create order
+        var order = new Order(option, member.getId(), request.quantity(), request.message());
+
         // deduct points
-        var price = option.getProduct().getPrice() * request.quantity();
-        member.deductPoint(price);
+        member.deductPoint(order.calculateTotalPrice());
         memberRepository.save(member);
 
         // save order
-        var saved = orderRepository.save(new Order(option, member.getId(), request.quantity(), request.message()));
+        var saved = orderRepository.save(order);
 
         // best-effort kakao notification
         sendKakaoMessageIfPossible(member, saved, option);
